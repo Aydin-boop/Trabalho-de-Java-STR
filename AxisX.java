@@ -25,10 +25,24 @@ public class AxisX implements Axis{
         
         switch(pos){
             case 1: 
-            moveBackward();
-            while (getPos() != 1){}
-            stop();
+                moveBackward();
+                while (getPos() != 1){}
+                stop();
                 break;
+            case 2:
+                do {
+                moveBackward();
+                while (getPos() != 1 || getPos() !=2){}
+                stop();
+                moveForward();
+                while (getPos() !=3 || getPos() !=2){}
+                stop();
+                    } while (getPos!=2);
+            case 3:
+                moveForward();
+                while (getPos()!=3) {}
+                stop();
+                break();
         }
 
         //throw new UnsupportedOperationException("Uninplemented method 'gotoPos'");
@@ -37,5 +51,6 @@ public class AxisX implements Axis{
         
     }
 }
+
 
 
