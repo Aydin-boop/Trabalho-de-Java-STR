@@ -29,12 +29,16 @@ public class AxisY implements Axis{
                 stop();
             break;
             case 2: 
-                moveBackward();
-                while (getPos() != 1 && getPos() != 2){}
-                stop();
+            if (getPos() == 1) {    
                 moveForward();
                 while (getPos() != 2){}
                 stop();
+            }
+            else if (getPos() == 3) {
+                moveBackward();
+                while (getPos() !=2){}
+                stop();
+            }
             break;
             case 3: 
                 moveForward();
