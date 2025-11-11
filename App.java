@@ -46,6 +46,9 @@ public class App {
         AxisX axisX = new AxisX();
         AxisY axisY = new AxisY();
         AxisZ axisZ = new AxisZ();
+
+        Pallete pallete = new Pallete();
+
         int op = -1;
         int op1 = -1;
         int op2 = -1;
@@ -111,11 +114,25 @@ public class App {
                     axisYThreadCalibration.join();
                     break;
                 case 7:
-                    PlaceBlock placeBlock = new PlaceBlock();
-                    placeBlock.place();
+                    pallete.placePallete();
+                    break;
+                case 8:
+                    pallete.takePallete();
                     break;
             }
         }
         scan.close();
     }
 }
+
+/*
+ * 
+ * ter duas matrizes 3 por 3
+ * para meter para tirar
+ * 30 3
+ * 20 2
+ * 10 1
+ * 1 2 3 1 2 3
+ * 
+ * 
+ */
