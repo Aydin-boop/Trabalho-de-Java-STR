@@ -1,6 +1,43 @@
 import java.util.Scanner;
 
 public class App {
+
+    public static Thread axisXThread(int pos) {
+        AxisX axisX = new AxisX();
+        Thread axisXThread = new Thread(){ 
+            public void run(){
+                axisX.gotoPos(pos);
+            }
+        }; 
+        axisXThread.start();
+        return axisXThread; 
+        
+    }
+
+    public static Thread axisZThread(int pos) {
+        AxisZ axisZ = new AxisZ();
+        Thread axisZThread = new Thread(){ 
+            public void run(){
+                axisZ.gotoPos(pos);
+            }
+        }; 
+        axisZThread.start();
+        return axisZThread; 
+        
+    }
+
+    public static Thread axisYThread(int pos) {
+        AxisY axisY = new AxisY();
+        Thread axisYThread = new Thread(){ 
+            public void run(){
+                axisY.gotoPos(pos);
+            }
+        }; 
+        axisYThread.start();
+        return axisYThread; 
+        
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("Labwork 2 from Java!");
         
@@ -12,6 +49,9 @@ public class App {
         int op = -1;
         int op1 = -1;
         int op2 = -1;
+       
+       
+       
         Scanner scan = new Scanner(System.in);
         while(op != 0) {
             System.out.println("Enter an option:");
@@ -20,8 +60,15 @@ public class App {
                 case 1: axisX.moveForward(); break;
                 case 2: axisX.moveBackward(); break;
                 case 3: axisX.stop(); break;
-                
-                case 4: 
+                case 4: System.out.println("para que coordenadas quer ir? Coloque os inputs no formato X Z");
+                        int posX = scan.nextInt();
+                        int posZ = scan.nextInt();
+                        Thread axisXThread = axisXThread(posX);
+                        Thread axisZThread = axisZThread(posZ);
+                        axisXThread.join();
+                        axisZThread.join();
+                        break;
+                case 5: 
                     System.out.println("Which Axis do you want to move?: (1-X, 2-Y, 3-Z)");
                     op1 = scan.nextInt();
                     switch(op1){
@@ -53,8 +100,18 @@ public class App {
                             case 30: axisZ.gotoPos(30); break;
                         } break;
                     } break;
-                    
-                 
+                case 6: System.out.println("System initializing calibration");
+                        axisX.moveBackward();      
+                        do {
+                        axisY.moveBackward();      
+                        } while (axisY.getPos()==-1);
+                        axisZ.moveBackward();    
+                Thread axisXThreadCalibration = axisXThread(1);
+                        Thread axisZThreadCalibration = axisZThread(1);
+                        Thread axisYThreadCalibration = axisYThread(2);
+                        axisXThreadCalibration.join();
+                        axisZThreadCalibration.join();
+                        axisYThreadCalibration.join();
             }
         }
         scan.close();
