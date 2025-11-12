@@ -38,6 +38,29 @@ public class App {
 
     }
 
+    public static int VerMaisProximo(char pos, Pallet[][] s, int Xprox) {
+        int menor = 2;
+        int maisProximo = 0;
+        for (int i = 0; i<3; i++) {
+            for (int j = 0; j<3; j++) {
+                if (pos == 'x') {
+                    AxisX axisX = new AxisX();
+                    if ((Math.abs(axisX.getPos()-1 - i) < menor) && (s[i][j] == null)) {
+                        menor = axisX.getPos()-1 - i;
+                        maisProximo = axisX.getPos() - menor; 
+                    }
+                } else {
+                    AxisZ axisZ = new AxisZ();
+                    if ((Math.abs(axisZ.getPos()-1 - j) < menor) && s[Xprox- 1][j] == null) { //isto nunca da erro porque ele so entra no caso dos zzs depois de ter entrado no dos xxs
+                        menor = axisZ.getPos()-1 - j;
+                        maisProximo = axisZ.getPos() - menor; 
+                    } 
+                }
+            }
+        }
+        return maisProximo;
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("Labwork 2 from Java!");
 
@@ -120,18 +143,23 @@ public class App {
                     axisYThreadCalibration.join();
                     break;
                 case 7:
-                Scanner myObj = new Scanner(System.in);    
-                System.out.println("\nWhat is the pallet's metadata? Introduce product type, humidity level, producerID, Xdestination, Zdestination, shipping date\n");
-                    String product_type = myObj.nextLine();
-                    int humidity = scan.nextInt();
-                    int producerID = scan.nextInt();
-                    int posXposto = scan.nextInt();
-                    int posZposto = scan.nextInt();
-                    int shipping_day = scan.nextInt();
-                    int shipping_month = scan.nextInt();
-                    int shipping_year = scan.nextInt();
+                //if (existe palete na cage) {
+                    Scanner myObj = new Scanner(System.in);    
+                    System.out.println("\n Manual pallet storing: What is the pallet's metadata? Introduce product type, humidity level, producerID, Xdestination, Zdestination, shipping date\n");
+                    System.out.println("Product type: ");    String product_type = myObj.nextLine();
+                    System.out.println("Humidity: ");   int humidity = scan.nextInt();
+                    System.out.println("Producer ID: ");    int producerID = scan.nextInt();
+                    System.out.println("Desired X: ");    int posXposto = scan.nextInt();
+                    System.out.println("Desired Z: ");    int posZposto = scan.nextInt();
+                    System.out.println("Shipping day: ");    int shipping_day = scan.nextInt();
+                    System.out.println("Shipping month: ");    int shipping_month = scan.nextInt();
+                    System.out.println("Shipping year: ");    int shipping_year = scan.nextInt();
+                    if ((posXposto == 0) && (posZposto == 0)) {
+                        posXposto = VerMaisProximo('x', Storage, -1);
+                        posZposto = VerMaisProximo('z', Storage, posXposto);
+                    }
                     Pallet p = new Pallet(product_type, humidity, producerID, posXposto, posZposto, shipping_day, shipping_month, shipping_year);
-                    //System.out.printf("%b%n", (p.isTherePallet(posXposto, posZposto)));
+
                     if (Storage[posXposto - 1][posZposto - 1] == null) {
                     axisXThread = axisXThread(posXposto);
                     axisZThread = axisZThread(posZposto*10);
@@ -140,11 +168,42 @@ public class App {
                     mechanism.putPartInCell();
                     Storage[posXposto - 1][posZposto - 1] = p;
                     } else {
-                        System.out.println("There is a pallet there!!!!! Info....." + Storage[posXposto - 1][posZposto - 1].product_type() + Storage[posXposto - 1][posZposto - 1].humidity() + Storage[posXposto - 1][posZposto - 1].producer_ID() + Storage[posXposto - 1][posZposto - 1].desiredX() + Storage[posXposto - 1][posZposto - 1].desiredZ() + Storage[posXposto - 1][posZposto - 1].shipping_day() +"/"+Storage[posXposto - 1][posZposto - 1].shipping_month()+"/"+Storage[posXposto - 1][posZposto - 1].shipping_year());
+                        System.out.println("There is a pallet there! Info:" +
+                        "\nProductType: " + Storage[posXposto - 1][posZposto - 1].product_type() +
+                        "\nHumidity: " + Storage[posXposto - 1][posZposto - 1].humidity() + 
+                        "\nproducer_ID: " + Storage[posXposto - 1][posZposto - 1].producer_ID() + 
+                        "\ndesiredX: " + Storage[posXposto - 1][posZposto - 1].desiredX() + 
+                        "\ndesiredZ: " + Storage[posXposto - 1][posZposto - 1].desiredZ() + 
+                        "\nShippingDate: " + Storage[posXposto - 1][posZposto - 1].shipping_day() +"/"+Storage[posXposto - 1][posZposto - 1].shipping_month()+"/"+Storage[posXposto - 1][posZposto - 1].shipping_year());
                     }
+                    // else { println ("Nao meteste palete na cage!!!"); }
                     break;
                 case 8:
-                    mechanism.takePartInCell();
+                    //if(! existe palete na cage) {
+                    System.out.println("Manual pallet removal: What are the coordinates of the pallet you want to remove?");
+                    System.out.println("Desired X: "); int posXremovido = scan.nextInt();
+                    System.out.println("Desired Z: "); int posZremovido = scan.nextInt();
+                    Pallet p1 = Storage[posXremovido - 1][posZremovido - 1];
+
+                    if (p1 != null) {
+                        axisXThread = axisXThread(posXremovido);
+                        axisZThread = axisZThread(posZremovido);
+                        axisXThread.join();
+                        axisZThread.join();
+                        mechanism.takePartInCell();
+                        System.out.println("Pallet with info" +
+                            "\nProductType: " + Storage[posXremovido - 1][posZremovido - 1].product_type() +
+                            "\nHumidity: " + Storage[posXremovido - 1][posZremovido - 1].humidity() + 
+                            "\nproducer_ID: " + Storage[posXremovido - 1][posZremovido - 1].producer_ID() + 
+                            "\ndesiredX: " + Storage[posXremovido - 1][posZremovido - 1].desiredX() + 
+                            "\ndesiredZ: " + Storage[posXremovido - 1][posZremovido - 1].desiredZ() + 
+                            "\nShippingDate: " + Storage[posXremovido - 1][posZremovido - 1].shipping_day() +"/"+Storage[posXremovido - 1][posZremovido - 1].shipping_month()+"/"+Storage[posXremovido - 1][posZremovido - 1].shipping_year() + 
+                            "\nremoved!"); 
+                        Storage[posXremovido - 1][posZremovido - 1] = null;
+                    }  else {
+                        System.out.println("There is no pallet at the coordinates ("+ posXremovido + "," + posZremovido + ")!\n");
+                    }
+                    // } else{ println(ja tens uma palete na cage!!! livra-te dela!!!); } 
                     break;
             }
         }
