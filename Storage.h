@@ -151,6 +151,14 @@ JNIEXPORT void JNICALL Java_Storage_ledOn
 JNIEXPORT void JNICALL Java_Storage_ledsOff
   (JNIEnv *, jclass);
 
+/*
+ * Class:     Storage
+ * Method:    cageFull
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Storage_cageFull
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

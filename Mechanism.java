@@ -1,6 +1,6 @@
 public class Mechanism {
-    
-    public void ledOn(int ledNumber) {
+
+    public static void ledOn(int ledNumber) {
         Storage.ledOn(ledNumber);
     }
 
@@ -9,24 +9,20 @@ public class Mechanism {
     }
 
     public Boolean switch1Pressed() {
-        //todo for now returns false
-        //if (Storage.getSwtich1() == 1); return true;
-        return false;
+        return (Storage.getSwtich1() == 1);
     }
 
     public Boolean switch2Pressed() {
-        //todo for now returns false
-        //if (Storage.getSwtich2() == 1); return true;
-        return false;
+        return (Storage.getSwtich2() == 1); 
     }
 
     public Boolean bothSwitchesPressed() {
-        //todo for now returns false
-        //if (Storage.getSwtich2() == 1); return true;
+        // todo for now returns false
+        // if (Storage.getSwtich2() == 1); return true;
         return false;
     }
 
-public void putPartInCell() {
+    public void putPartInCell() {
         AxisY axisY = new AxisY();
         AxisZ axisZ = new AxisZ();
 
@@ -57,4 +53,9 @@ public void putPartInCell() {
         axisZ.gotoPos(i * 10);
         axisY.gotoPos(2);
     }
+
+    public static int cageFull() {
+        return Storage.cageFull();
+    }
+
 }

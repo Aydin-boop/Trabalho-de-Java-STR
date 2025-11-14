@@ -7,6 +7,7 @@ public class Pallet {
     int shipping_day;
     int shipping_month;
     int shipping_year;
+    boolean alert;
 
     public Pallet(String product_type, int humidity, int producer_ID, int desiredX, int desiredZ, int shipping_day, int shipping_month, int shipping_year) {
         this.product_type = product_type;
@@ -17,6 +18,7 @@ public class Pallet {
         this.shipping_day = shipping_day;
         this.shipping_month = shipping_month;
         this.shipping_year = shipping_year;
+        this.alert = false;
     }
 
     public String product_type() {
@@ -49,5 +51,13 @@ public class Pallet {
 
     public int shipping_year() {
         return shipping_year;
+    }
+
+    public boolean is_alert() {
+        return alert;
+    }
+
+    public void change_alert(boolean New_alert) {
+        this.alert = New_alert;
     }
 }
