@@ -150,12 +150,11 @@ public class App {
                                 + s[posXremovido - 1][posZremovido - 1].shipping_year()
                                 + "\nremoved!");
                         s[posXremovido - 1][posZremovido - 1] = null;
+                        axisY.gotoPos(2);
                     }
                 }
             }
         }
-
-        isSwitchesInterrupted = true;
     }
 
     public static Thread switchesThread(Pallet[][] s) {
@@ -382,7 +381,7 @@ public class App {
                     axisXThread.join();
                     axisZThread.join();
                     axisY3.gotoPos(1);
-
+                    Boolean alertBoolean = false;
                     System.out.println("Manual pallete storing: What is the pallete's metadata? Don't forget to put it on the cage!");
                     System.out.println("Product type: ");
                     String product_type = myObj.nextLine();
@@ -421,18 +420,22 @@ public class App {
                             if (humidity > Max_humidity) {
                                 isLed1Interrupted = false;
                                 Led1On = led1On();
+                                alertBoolean = true;
                             }
                             if (shipping_year > Max_year) {
                                 isLed1Interrupted = false;
                                 Led1On = led1On();
+                                alertBoolean = true;
                             } else if ((shipping_year == Max_year) && (shipping_month > Max_month)) {
                                 isLed1Interrupted = false;
                                 Led1On = led1On();
+                                alertBoolean = true;
                             } else if ((shipping_year == Max_year) && (shipping_month == Max_month) && (shipping_day > Max_day)) {
                                 isLed1Interrupted = false;
                                 Led1On = led1On();
+                                alertBoolean = true;
                             }
-                            if (isLed1Interrupted == false) {
+                            if (alertBoolean == true) {
                                 p.change_alert(true);
                                 System.out.println("Pallete with Alert!");
                             }
@@ -519,7 +522,7 @@ public class App {
                 case 10:
                     System.out.println("What is the maximum humidity that this storage can take?");
                     Max_humidity = scan.nextInt();
-                    System.out.println("Verifying if any of the pallets surpasses the humidity threshold...");
+                    System.out.println("Verifying if any of the pallets surpasses a threshold...");
                     alertON = verifyAlerts(Storage, Max_humidity, Max_day, Max_month, Max_year);
                     if (alertON) {
                         isLed1Interrupted = false;
@@ -536,7 +539,7 @@ public class App {
                     Max_month = scan.nextInt();
                     System.out.println("Shipping Year: ");
                     Max_year = scan.nextInt();
-                    System.out.println("Verifying if any of the pallets surpasses the shipping date threshold...");
+                    System.out.println("Verifying if any of the pallets surpasses a threshold...");
                     alertON = verifyAlerts(Storage, Max_humidity, Max_day, Max_month, Max_year);
                     if (alertON) {
                         isLed1Interrupted = false;
@@ -634,18 +637,6 @@ public class App {
             }
         }
         scan.close();
-        switchesThread(Storage).join();
+        isSwitchesInterrupted = true;
     }
 }
-
-/*
- * 
- * ter duas matrizes 3 por 3
- * para meter para tirar
- * 30       3
- * 20       2
- * 10       1
- *  1 2 3     1 2 3
- * 
- * 
- */
