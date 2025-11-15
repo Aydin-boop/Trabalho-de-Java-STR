@@ -9,7 +9,8 @@ public class Pallet {
     int shipping_year;
     boolean alert;
 
-    public Pallet(String product_type, int humidity, int producer_ID, int desiredX, int desiredZ, int shipping_day, int shipping_month, int shipping_year) {
+    public Pallet(String product_type, int humidity, int producer_ID, int desiredX, int desiredZ, int shipping_day,
+            int shipping_month, int shipping_year) {
         this.product_type = product_type;
         this.humidity = humidity;
         this.producer_ID = producer_ID;
@@ -29,6 +30,7 @@ public class Pallet {
         return humidity;
     }
 
+    //
     public int producer_ID() {
         return producer_ID;
     }
@@ -37,7 +39,7 @@ public class Pallet {
         return desiredX;
     }
 
-    public int desiredZ(){
+    public int desiredZ() {
         return desiredZ;
     }
 
@@ -45,7 +47,7 @@ public class Pallet {
         return shipping_day;
     }
 
-    public int shipping_month(){
+    public int shipping_month() {
         return shipping_month;
     }
 

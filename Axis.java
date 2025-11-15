@@ -1,10 +1,14 @@
 public interface Axis {
 
     public void moveForward();
+
     public void moveBackward();
+
     public void stop();
+
     public int getPos();
 
-    //new method to implement in JAVA
-    public void gotoPos (int pos);
+    // new method to implement in JAVA
+    public void gotoPos(int pos);
 }
+//

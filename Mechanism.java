@@ -13,7 +13,7 @@ public class Mechanism {
     }
 
     public Boolean switch2Pressed() {
-        return (Storage.getSwtich2() == 1); 
+        return (Storage.getSwtich2() == 1);
     }
 
     public Boolean bothSwitchesPressed() {
@@ -59,3 +59,4 @@ public class Mechanism {
     }
 
 }
+//

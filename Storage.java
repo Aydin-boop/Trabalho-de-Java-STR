@@ -42,3 +42,4 @@ public class Storage {
 
     static synchronized native public int cageFull();
 }
+//
