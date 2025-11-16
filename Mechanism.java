@@ -17,9 +17,7 @@ public class Mechanism {
     }
 
     public Boolean bothSwitchesPressed() {
-        // todo for now returns false
-        // if (Storage.getSwtich2() == 1); return true;
-        return false;
+        return(Storage.getSwtich1_2() == 1);
     }
 
     public void putPartInCell() {
