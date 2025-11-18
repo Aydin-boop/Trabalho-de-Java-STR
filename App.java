@@ -68,6 +68,9 @@ public class App {
                 case 9:
                     menu.searchPalleteType();
                     break;
+                case 10:
+                    menu.removeSearchedPallete();
+                    break;
                 case 100000:
                     break;
                 default:

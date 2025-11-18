@@ -949,4 +949,115 @@ public class Menu {
 
         }
     }
+
+    public void removeSearchedPallete() throws InterruptedException {
+        boolean isEmpty = true;
+        int option;
+        System.out.println("Do you want to remove by type of product (1) or by producer ID (2)?");
+        option = scan.nextInt();
+        switch (option) {
+            case 1:
+                System.out.println("What is the type of product you want to remove?");
+                String productType = myObj.nextLine();
+                for (int i = 2; i >= 0; i--) {
+                    for (int j = 0; j < 3; j++) {
+                        if (storage[j][i] != null) {
+                            if (productType.equals(storage[j][i].product_type())) {
+                                // isEmpty = false; // pq?
+                                System.out.println("Pallete at (" + storage[j][i].desiredX + ","
+                                        + storage[j][i].desiredZ + ") With info:"
+                                        + "\nProducer ID: " + storage[j][i].producer_ID()
+                                        + "\nHumidity: " + String.format("%.1f", storage[j][i].humidity()) + " %"
+                                        + "\nShipping Date " + storage[j][i].shipping_day() + "/"
+                                        + storage[j][i].shipping_month() + "/"
+                                        + storage[j][i].shipping_year()
+                                        + "\nDestination: " + storage[j][i].destination()
+                                        + "\nAlert State: " + storage[j][i].is_alert());
+
+                            }
+                        }
+                    }
+
+                    if (isEmpty == false) {
+                        System.out.println("");
+                    }
+                }
+                System.out.println("removing pallets with type of product (1)");
+                int posXremovido = 0;
+                int posZremovido = 0;
+
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        if (storage[i][j] != null) {
+                            // System.out.println(storage[j][i].product_type());
+                            if (productType.equals(storage[j][i].product_type())) {
+                                info.guardaAcao(3); // como esta a remover alertas, temos de dizer que isto é uma ação
+                                                    // especial
+                                posXremovido = storage[i][j].desiredX();
+                                posZremovido = storage[i][j].desiredZ();
+                                System.out.println(storage[i][j].desiredZ() + " " + storage[i][j].desiredX());
+                                axisXThread = axisXThread(posXremovido);
+                                axisZThread = axisZThread(posZremovido);
+                                axisXThread.join();
+                                axisZThread.join();
+                                mechanism.takePartInCell();
+                                axisXThread = axisXThread(3);
+                                axisZThread = axisZThread(1);
+                                axisXThread.join();
+                                axisZThread.join();
+                                if (Mechanism.cageFull() == 1) {
+                                    System.out.println(
+                                            "Click on the button \"takeFromCage\" to remove the pallet from the system");
+                                    do {
+                                    } while (Mechanism.cageFull() == 1);
+                                }
+                                axisY.gotoPos(1);
+                                System.out.println("Pallet removed!");
+                                storage[posXremovido - 1][posZremovido - 1] = null;
+                                info.guardaY(2);
+                                axisY.gotoPos(2);
+                            }
+                        }
+                    }
+                }
+                if (isEmpty) {
+                    System.out.println("There are no matches for that product type!");
+                }
+                break;
+            case 2:
+                boolean isE = true;
+                System.out.println("What is the producer ID you want to display?");
+                int prodID = scan.nextInt();
+                for (int i = 2; i >= 0; i--) {
+                    for (int j = 0; j < 3; j++) {
+                        if (storage[j][i] != null) {
+                            if (prodID == storage[j][i].producer_ID()) {
+                                isE = false;
+                                System.out.println("Pallete at (" + storage[j][i].desiredX + ","
+                                        + storage[j][i].desiredZ + ") With info:"
+                                        + "\nProduct Type: " + storage[j][i].product_type()
+                                        + "\nHumidity: " + String.format("%.1f", storage[j][i].humidity()) + " %"
+                                        + "\nShipping Date " + storage[j][i].shipping_day() + "/"
+                                        + storage[j][i].shipping_month() + "/"
+                                        + storage[j][i].shipping_year()
+                                        + "\nDestination: " + storage[j][i].destination()
+                                        + "\nAlert State: " + storage[j][i].is_alert());
+                            }
+                        }
+                    }
+                    if (isE == false) {
+                        System.out.println("");
+                    }
+                }
+                if (isE) {
+                    System.out.println("There are no matches for that producer ID!");
+                }
+                break;
+            default:
+                System.out.println("Incorrect value for an option!");
+                break;
+
+        }
+    }
+
 }
