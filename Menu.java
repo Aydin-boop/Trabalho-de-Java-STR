@@ -20,6 +20,8 @@ public class Menu {
     static Thread Led2On;
     static Thread LedsOn;
 
+    static Thread lastAxisPositionThread;
+
     int op1;
     int op2;
     //
@@ -77,7 +79,7 @@ public class Menu {
     public static Thread led1On() {
         Thread led1onThread = new Thread() {
             public void run() {
-                while ((!isLed1Interrupted)&&(isLed2Interrupted)) {
+                while ((!isLed1Interrupted) && (isLed2Interrupted)) {
                     Mechanism.ledOn(1);
                     try {
                         Thread.sleep(500);
@@ -125,9 +127,15 @@ public class Menu {
             public void run() {
                 while ((!isLed2Interrupted) && (!isLed1Interrupted)) {
                     Mechanism.ledOn(1);
-                    try {Thread.sleep(250);} catch (InterruptedException e) {}
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                    }
                     Mechanism.ledOn(2);
-                    try {Thread.sleep(250);} catch (InterruptedException e) {}
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
         };
@@ -135,27 +143,51 @@ public class Menu {
         return led2onThread;
     }
 
+    // guarda a ultima posicao onde o cage e detedado no info.guardalastXYZ
+    public static Thread lastAxisPositionThread() {
+        Thread lastAxisPositionThread = new Thread() {
+            public void run() {
+                while (true) {
+                    if (axisX.getPos() != -1) {
+                        // System.out.println(axisX.getPos());//meter um print no thread nao e bom ideia
+                        info.guardaLastX(axisX.getPos());
+                    }
+                    if (axisY.getPos() != -1) {
+                        // System.out.println(axisY.getPos());
+                        info.guardaLastY(axisY.getPos());
+                    }
+                    if (axisZ.getPos() != -1) {
+                        // System.out.println(axisZ.getPos());
+                        info.guardaLastZ(axisZ.getPos());
+                    }
+                }
+            }
+        };
+        lastAxisPositionThread.start();
+        return lastAxisPositionThread;
+    }
+
     public static Thread EmergencyThread() {
         Thread EThread = new Thread() {
             public void run() {
-                while (true) { 
+                while (true) {
                     if (mechanism.bothSwitchesPressed()) {
-                        //System.out.println("EMETRTTGUGJFIRGJFIGJFIGFJIFJGFI");       
-                            axisZ.stop();
-                            axisX.stop();
-                            axisY.stop();
-                            axisZThread.interrupt();
-                            axisXThread.interrupt();
-                            axisYThread.interrupt();
-                            emergencyON = true;
-                            isLed1Interrupted = false;
-                            isLed2Interrupted = false;
-                            LedsOn = BothLeds();
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                System.out.println("Interrupted Exception in switches Thread!!!");
-                            }
+                        // System.out.println("EMETRTTGUGJFIRGJFIGJFIGFJIFJGFI");
+                        axisZ.stop();
+                        axisX.stop();
+                        axisY.stop();
+                        // axisZThread.interrupt();
+                        // axisXThread.interrupt();
+                        // axisYThread.interrupt();
+                        emergencyON = true;
+                        isLed1Interrupted = false;
+                        isLed2Interrupted = false;
+                        LedsOn = BothLeds();
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted Exception in switches Thread!!!");
+                        }
                         // Espera o botão ser solto antes de continuar
                         while (mechanism.bothSwitchesPressed()) {
                             try {
@@ -164,11 +196,11 @@ public class Menu {
                                 System.out.println("Interrupted Exception in switches Thread!!!");
                             }
                         }
-                    try {
-                        Thread.sleep(100); // evita busy-waiting agressivo
-                    } catch (InterruptedException e) {
-                        System.out.println("Interrupted Exception in switches Thread!!!");
-                    }
+                        try {
+                            Thread.sleep(100); // evita busy-waiting agressivo
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted Exception in switches Thread!!!");
+                        }
 
                     }
                 }
@@ -178,43 +210,49 @@ public class Menu {
         return EThread;
     }
 
-    public static Thread VerificaAlertasThread(Pallet [][] s) {
-         Thread EThread = new Thread() {
+    public static Thread VerificaAlertasThread(Pallet[][] s) {
+        Thread EThread = new Thread() {
             public void run() {
-                while (true) { 
+                while (true) {
                     if (mechanism.switch1Pressed() && (emergencyON == true)) {
-                            mechanism.ledsOff();    
-                            BothLeds().interrupt();
-                            mechanism.ledsOff();
-                            emergencyON = false;
-                            isLed1Interrupted = true;
-                            isLed2Interrupted = true;
-                            do{
-                                axisX.moveBackward();
-                            } while(axisX.getPos() == -1);
-                            axisXThread = axisXThread(info.posX());
-                            do{
-                                axisZ.moveBackward();
-                            } while(axisZ.getPos() == -1);
-                            axisZThread = axisZThread(info.posZ());
-                            axisYThread = axisYThread(info.posY());
-                            
-                            if ((info.acao() != 3)  && (alertON == true)){
-                                try {
+                        mechanism.ledsOff();
+                        BothLeds().interrupt();
+                        mechanism.ledsOff();
+                        emergencyON = false;
+                        isLed1Interrupted = true;
+                        isLed2Interrupted = true;
+
+                        /*
+                         * try {
+                         * Calibration();
+                         * } catch (InterruptedException e) {
+                         * }
+                         */
+                        info.axisGoingTo();
+                        System.out.println("going towards right sentido " + info.posX() + " " + info.posY() + " "
+                                + info.posZ() + " e "
+                                + info.posLastX() + " " + info.posLastY() + " " + info.posLastZ());
+                        axisXThread = axisXThread(info.posX());
+                        axisZThread = axisZThread(info.posZ());
+                        axisYThread = axisYThread(info.posY());
+
+                        if ((info.acao() != 3) && (alertON == true)) {
+                            try {
                                 RemoveAlerts(s);
                                 System.out.println("Click on number 3 to calibrate and return to the menu");
-                                } catch (InterruptedException e){}
-                            }
-
-                            /* 
-                            try {
-                            axisXThread.join();
-                            axisZThread.join(); 
-                            axisYThread.join(); 
                             } catch (InterruptedException e) {
                             }
-                            */             
-                            
+                        }
+
+                        /*
+                         * try {
+                         * axisXThread.join();
+                         * axisZThread.join();
+                         * axisYThread.join();
+                         * } catch (InterruptedException e) {
+                         * }
+                         */
+
                         // Espera o botão ser solto antes de continuar
                         while (mechanism.switch1Pressed()) {
                             try {
@@ -237,7 +275,7 @@ public class Menu {
         return EThread;
     }
 
-    public static Thread switchesThread(Pallet[][] s) throws InterruptedException{
+    public static Thread switchesThread(Pallet[][] s) throws InterruptedException {
         Thread swiThread = new Thread() {
 
             public void run() {
@@ -314,7 +352,7 @@ public class Menu {
             for (int j = 0; j < 3; j++) {
                 if (s[i][j] != null) {
                     if (s[i][j].is_alert() == true) {
-                        info.guardaAcao(3); //como esta a remover alertas, temos de dizer que isto é uma ação especial
+                        info.guardaAcao(3); // como esta a remover alertas, temos de dizer que isto é uma ação especial
                         posXremovido = s[i][j].desiredX();
                         posZremovido = s[i][j].desiredZ();
                         axisXThread = axisXThread(posXremovido);
@@ -342,7 +380,7 @@ public class Menu {
                                 + "\nShippingDate: " + s[posXremovido - 1][posZremovido - 1].shipping_day() + "/"
                                 + s[posXremovido - 1][posZremovido - 1].shipping_month() + "/"
                                 + s[posXremovido - 1][posZremovido - 1].shipping_year()
-                                +"\nDestination: " + s[posXremovido - 1][posZremovido - 1].destination()
+                                + "\nDestination: " + s[posXremovido - 1][posZremovido - 1].destination()
                                 + "\nremoved!");
                         s[posXremovido - 1][posZremovido - 1] = null;
                         info.guardaY(2);
@@ -352,8 +390,9 @@ public class Menu {
             }
         }
     }
-    
-    public static boolean verifyAlerts(Pallet[][] Storage, float Max_humidity, int Max_day, int Max_month, int Max_year) {
+
+    public static boolean verifyAlerts(Pallet[][] Storage, float Max_humidity, int Max_day, int Max_month,
+            int Max_year) {
         boolean alertOn = false;
         for (int i = 2; i >= 0; i--) {
             for (int j = 0; j < 3; j++) {
@@ -439,11 +478,12 @@ public class Menu {
         axisYThread.join();
     }
 
-    public void ShowMenu(float Max_humidity, int Max_day, int Max_month, int Max_year) { //ve quais sao as cores que ficam mais bonitas sffv
+    public void ShowMenu(float Max_humidity, int Max_day, int Max_month, int Max_year) { // ve quais sao as cores que
+                                                                                         // ficam mais bonitas sffv
         String State;
         if (emergencyON)
             State = "\u001B[31mEmergency\u001B[0m";
-        else 
+        else
             State = "\u001B[32mNormal\u001B[0m";
         System.out.println("\n\n**********STORAGE MENU**********");
         System.out.println("1 - Move cage to the desired (X,Z) coordinates");
@@ -451,8 +491,10 @@ public class Menu {
         System.out.println("3 - Calibrate");
         System.out.println("4 - Place a pallete");
         System.out.println("5 - Withdraw pallete(s)");
-        System.out.println("6 - Define Humidity Threshold (currently at " + String.format("%.1f", Max_humidity) +  " %)");
-        System.out.println("7 - Define maximum shipping date (currently " + Max_day + "/" + Max_month + "/" + Max_year + ")");
+        System.out
+                .println("6 - Define Humidity Threshold (currently at " + String.format("%.1f", Max_humidity) + " %)");
+        System.out.println(
+                "7 - Define maximum shipping date (currently " + Max_day + "/" + Max_month + "/" + Max_year + ")");
         System.out.println("8 - List all stored pallets");
         System.out.println("9 - Display information of a pallete by product type or by producer ID");
         System.out.println("*****STORAGE STATE*****");
@@ -460,13 +502,14 @@ public class Menu {
         for (int i = 2; i >= 0; i--) {
             for (int j = 0; j < 3; j++) {
                 if ((storage[j][i] != null) && (storage[j][i].is_alert() == false)) {
-                    X = "\u001B[32mX\u001B[0m"; //X verde com background normal
+                    X = "\u001B[32mX\u001B[0m"; // X verde com background normal
                 } else if ((storage[j][i] != null) && (storage[j][i].is_alert() == true)) {
-                    X = "\u001B[31mY\u001B[0m"; //Y vermelho e com background normal
+                    X = "\u001B[31mY\u001B[0m"; // Y vermelho e com background normal
                 } else {
                     X = " ";
                 }
-                System.out.print("\u001B[33m[\u001B[0m" + X + "\u001B[33m]\u001B[0m "); //[] com cor amarela e com background normal
+                System.out.print("\u001B[33m[\u001B[0m" + X + "\u001B[33m]\u001B[0m "); // [] com cor amarela e com
+                                                                                        // background normal
             }
             System.out.print("\n");
         }
@@ -474,7 +517,7 @@ public class Menu {
         System.out.println("\u001B[32mX\u001B[0m - pallet there.");
         System.out.println("\u001B[31mY\u001B[0m - pallet with active alert.");
         System.out.println("  - No pallet there.");
-        System.out.println("\nCurrently at "+ State +" State");
+        System.out.println("\nCurrently at " + State + " State");
     }
 
     public void manualPosition() throws InterruptedException {
@@ -482,15 +525,15 @@ public class Menu {
         int posZ;
         info.guardaY(2);
         info.guardaAcao(0);
-        axisY.gotoPos(2); //para verificar que o sistema se move dentro dos seus limites
+        axisY.gotoPos(2); // para verificar que o sistema se move dentro dos seus limites
         do {
-        System.out.println("Input X and Z:");
-        posX = scan.nextInt();
-        posZ = scan.nextInt();
-        if ( (((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3))) )
-            System.out.println("Invalid coordinates!!!");
-        } while ( (((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3))) );
-        
+            System.out.println("Input X and Z:");
+            posX = scan.nextInt();
+            posZ = scan.nextInt();
+            if ((((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3))))
+                System.out.println("Invalid coordinates!!!");
+        } while ((((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3))));
+
         if ((posX == 0) && (posZ == 0)) {
             int pos[] = VerMaisProximo(storage);
             posX = pos[0];
@@ -505,52 +548,54 @@ public class Menu {
 
     }
 
-    public void manualPositionAxis() { //inputs verificados!!!
-    do {
-        System.out.println("Which Axis do you want to move?: (1-X, 2-Y, 3-Z)");
-        op1 = scan.nextInt();
-        switch (op1) {
-            case 1:
-                do {
-                System.out.println("Which Position of Axis X do you want to move?: (1, 2, 3)");
-                op2 = scan.nextInt();
-                if ((op2 < 0) || (op2>3))
-                    System.out.println("Invalid position!");
-                } while ((op2 < 0) || (op2>3));
-                info.guardaAcao(0);
-                info.guardaX(op2);
-                axisX.gotoPos(op2);
-                break;
-            case 2:
-                do {
-                System.out.println("Which Position of Axis Y do you want to move?: (1, 2, 3)");
-                op2 = scan.nextInt();
-                if ((op2 < 0) || (op2>3))
-                    System.out.println("Invalid Position!");
-                } while ((op2 < 0) || (op2>3));
-                info.guardaAcao(0);
-                info.guardaY(op2);
-                axisY.gotoPos(op2);
-                break;
-            case 3:
-                do {
-                System.out.println("Which Position of Axis Z do you want to move?: (1-1D, 10-1U , 2-2D, 20-2U, 3-3D, 30-3U)");
-                op2 = scan.nextInt();
-                if ((op2 < 0) || (op2>3))
-                    System.out.println("Invalid Position!");
-                } while ((op2 < 0) || (op2>3));
-                info.guardaAcao(0);
-                info.guardaZ(op2);
-                axisZ.gotoPos(op2);
-                break;
-            default: System.out.println("Invalid axis!");
-                break;
-        }
-        } while ((op1 < 0) || (op1>3));
+    public void manualPositionAxis() { // inputs verificados!!!
+        do {
+            System.out.println("Which Axis do you want to move?: (1-X, 2-Y, 3-Z)");
+            op1 = scan.nextInt();
+            switch (op1) {
+                case 1:
+                    do {
+                        System.out.println("Which Position of Axis X do you want to move?: (1, 2, 3)");
+                        op2 = scan.nextInt();
+                        if ((op2 < 0) || (op2 > 3))
+                            System.out.println("Invalid position!");
+                    } while ((op2 < 0) || (op2 > 3));
+                    info.guardaAcao(0);
+                    info.guardaX(op2);
+                    axisX.gotoPos(op2);
+                    break;
+                case 2:
+                    do {
+                        System.out.println("Which Position of Axis Y do you want to move?: (1, 2, 3)");
+                        op2 = scan.nextInt();
+                        if ((op2 < 0) || (op2 > 3))
+                            System.out.println("Invalid Position!");
+                    } while ((op2 < 0) || (op2 > 3));
+                    info.guardaAcao(0);
+                    info.guardaY(op2);
+                    axisY.gotoPos(op2);
+                    break;
+                case 3:
+                    do {
+                        System.out.println(
+                                "Which Position of Axis Z do you want to move?: (1-1D, 10-1U , 2-2D, 20-2U, 3-3D, 30-3U)");
+                        op2 = scan.nextInt();
+                        if ((op2 < 0) || (op2 > 3))
+                            System.out.println("Invalid Position!");
+                    } while ((op2 < 0) || (op2 > 3));
+                    info.guardaAcao(0);
+                    info.guardaZ(op2);
+                    axisZ.gotoPos(op2);
+                    break;
+                default:
+                    System.out.println("Invalid axis!");
+                    break;
+            }
+        } while ((op1 < 0) || (op1 > 3));
 
     }
 
-    public void addNewPallete() throws InterruptedException { //scans validos!
+    public void addNewPallete() throws InterruptedException { // scans validos!
         int posXposto;
         int posZposto;
         float humidity;
@@ -570,49 +615,52 @@ public class Menu {
         axisY.gotoPos(1);
         Boolean alertBoolean = false;
 
-        System.out.println("Manual pallete storing: What is the pallete's metadata? Don't forget to put it on the cage!");
+        System.out
+                .println("Manual pallete storing: What is the pallete's metadata? Don't forget to put it on the cage!");
         System.out.println("Product type: ");
         String product_type = myObj.nextLine();
         do {
-        System.out.println("Humidity: ");
-        humidity = scan.nextFloat();
-        if ((humidity < 0) || (humidity >100))
-            System.out.println("Invalid humidity Value!");
-        } while((humidity < 0) || (humidity >100));
+            System.out.println("Humidity: ");
+            humidity = scan.nextFloat();
+            if ((humidity < 0) || (humidity > 100))
+                System.out.println("Invalid humidity Value!");
+        } while ((humidity < 0) || (humidity > 100));
         System.out.println("Producer ID: ");
         int producerID = scan.nextInt();
         do {
-        System.out.println("Desired X: "); 
-        posXposto = scan.nextInt();
-        System.out.println("Desired Z: "); 
-        posZposto = scan.nextInt();
-        if ( (((posXposto <= 0) || (posXposto > 3)) && ((posZposto!= 0))) || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3))) )
-            System.out.println("Invalid coordinates!");
-        } while ( (((posXposto <= 0) || (posXposto > 3)) && ((posZposto!= 0))) || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3))) );
+            System.out.println("Desired X: ");
+            posXposto = scan.nextInt();
+            System.out.println("Desired Z: ");
+            posZposto = scan.nextInt();
+            if ((((posXposto <= 0) || (posXposto > 3)) && ((posZposto != 0)))
+                    || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3))))
+                System.out.println("Invalid coordinates!");
+        } while ((((posXposto <= 0) || (posXposto > 3)) && ((posZposto != 0)))
+                || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3))));
         do {
-        System.out.println("Shipping day (put 0 on the back in case it is lower than 10): ");
-        shipping_day = scan.nextInt();
-        System.out.println("Shipping month(put 0 on the back in case it is lower than 10): ");
-        shipping_month = scan.nextInt();
-        System.out.println("Shipping year: ");
-        shipping_year = scan.nextInt();
-        if (shipping_day < 10) 
-            day = "0" + shipping_day;
-        else 
-            day = "" + shipping_day;
-        if (shipping_month < 10) 
-            month = "0" + shipping_month;
-        else 
-            month = "" + shipping_month;
-        dateInput = (day + "/" + month + "/" + shipping_year);
-        isValid = isValidDate(dateInput, formatter);
-        if (isValid == false) {
-            System.out.println("Invalid Date!!!");
-        }
+            System.out.println("Shipping day (put 0 on the back in case it is lower than 10): ");
+            shipping_day = scan.nextInt();
+            System.out.println("Shipping month(put 0 on the back in case it is lower than 10): ");
+            shipping_month = scan.nextInt();
+            System.out.println("Shipping year: ");
+            shipping_year = scan.nextInt();
+            if (shipping_day < 10)
+                day = "0" + shipping_day;
+            else
+                day = "" + shipping_day;
+            if (shipping_month < 10)
+                month = "0" + shipping_month;
+            else
+                month = "" + shipping_month;
+            dateInput = (day + "/" + month + "/" + shipping_year);
+            isValid = isValidDate(dateInput, formatter);
+            if (isValid == false) {
+                System.out.println("Invalid Date!!!");
+            }
         } while (isValid == false);
         System.out.println("Destination: ");
         String destination = myObj.nextLine();
-  
+
         if ((posXposto == 0) && (posZposto == 0)) {
             int pos[] = VerMaisProximo(storage);
             posXposto = pos[0];
@@ -664,7 +712,7 @@ public class Menu {
         } else {
             System.out.println("There is a pallete there! Info:"
                     + "\nProductType: " + storage[posXposto - 1][posZposto - 1].product_type()
-                    + "\nHumidity: " + String.format("%.1f",storage[posXposto - 1][posZposto - 1].humidity()) + " %"
+                    + "\nHumidity: " + String.format("%.1f", storage[posXposto - 1][posZposto - 1].humidity()) + " %"
                     + "\nproducer_ID: " + storage[posXposto - 1][posZposto - 1].producer_ID()
                     + "\ndesiredX: " + storage[posXposto - 1][posZposto - 1].desiredX()
                     + "\ndesiredZ: " + storage[posXposto - 1][posZposto - 1].desiredZ()
@@ -676,7 +724,7 @@ public class Menu {
 
     }
 
-    public void removePallete() throws InterruptedException { //scans validados!
+    public void removePallete() throws InterruptedException { // scans validados!
         int posXremovido;
         int posZremovido;
         System.out.println("What is the mode you want to unload the pallets with? Manual (1) or Assisted (2)?");
@@ -694,9 +742,9 @@ public class Menu {
                 posXremovido = scan.nextInt();
                 System.out.println("Desired Z: ");
                 posZremovido = scan.nextInt();
-            if ((posXremovido <= 0 ) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3))  
-                System.out.println("Invalid coordinates!");
-            } while ((posXremovido <= 0 ) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3));
+                if ((posXremovido <= 0) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3))
+                    System.out.println("Invalid coordinates!");
+            } while ((posXremovido <= 0) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3));
             Pallet p1 = storage[posXremovido - 1][posZremovido - 1];
 
             if (p1 != null) {
@@ -727,7 +775,8 @@ public class Menu {
                 isLed2Interrupted = true;
                 System.out.println("Pallet with info"
                         + "\nProductType: " + storage[posXremovido - 1][posZremovido - 1].product_type()
-                        + "\nHumidity: " + String.format("%.1f",storage[posXremovido - 1][posZremovido - 1].humidity()) + " %"
+                        + "\nHumidity: " + String.format("%.1f", storage[posXremovido - 1][posZremovido - 1].humidity())
+                        + " %"
                         + "\nproducer_ID: " + storage[posXremovido - 1][posZremovido - 1].producer_ID()
                         + "\ndesiredX: " + storage[posXremovido - 1][posZremovido - 1].desiredX()
                         + "\ndesiredZ: " + storage[posXremovido - 1][posZremovido - 1].desiredZ()
@@ -748,14 +797,14 @@ public class Menu {
         }
     }
 
-    public void maxHumidity() { //scans validados!
+    public void maxHumidity() { // scans validados!
         do {
-        System.out.println("What is the maximum humidity that this storage can take?");
-        Max_humidity = scan.nextFloat();
-        if ((Max_humidity< 0) || (Max_humidity>100)) {
-            System.out.println("Invalid humidity value!");
-        }
-        } while ((Max_humidity< 0) || (Max_humidity>100));
+            System.out.println("What is the maximum humidity that this storage can take?");
+            Max_humidity = scan.nextFloat();
+            if ((Max_humidity < 0) || (Max_humidity > 100)) {
+                System.out.println("Invalid humidity value!");
+            }
+        } while ((Max_humidity < 0) || (Max_humidity > 100));
         System.out.println("Verifying if any of the pallets surpasses a threshold...");
         alertON = verifyAlerts(storage, Max_humidity, Max_day, Max_month, Max_year);
         if (alertON) {
@@ -766,33 +815,33 @@ public class Menu {
         }
     }
 
-    public void maxDate() { //scans validados!
+    public void maxDate() { // scans validados!
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String dateInput;
         boolean isValid;
         String day;
         String month;
         do {
-        System.out.println("What is the maximum shipping date for any of these pallets?");
-        System.out.println("Shipping Day: ");
-        Max_day = scan.nextInt();
-        System.out.println("Shipping Month: ");
-        Max_month = scan.nextInt();
-        System.out.println("Shipping Year: ");
-        Max_year = scan.nextInt();
-        if (Max_day < 10) 
-            day = "0" + Max_day;
-        else 
-            day = "" + Max_day;
-        if (Max_month < 10) 
-            month = "0" + Max_month;
-        else 
-            month = "" + Max_month;
-        dateInput = (day + "/" + month + "/" + Max_year);
-        isValid = isValidDate(dateInput, formatter);
-        if (isValid == false) {
-            System.out.println("Invalid Date!!!");
-        }
+            System.out.println("What is the maximum shipping date for any of these pallets?");
+            System.out.println("Shipping Day: ");
+            Max_day = scan.nextInt();
+            System.out.println("Shipping Month: ");
+            Max_month = scan.nextInt();
+            System.out.println("Shipping Year: ");
+            Max_year = scan.nextInt();
+            if (Max_day < 10)
+                day = "0" + Max_day;
+            else
+                day = "" + Max_day;
+            if (Max_month < 10)
+                month = "0" + Max_month;
+            else
+                month = "" + Max_month;
+            dateInput = (day + "/" + month + "/" + Max_year);
+            isValid = isValidDate(dateInput, formatter);
+            if (isValid == false) {
+                System.out.println("Invalid Date!!!");
+            }
         } while (isValid == false);
         System.out.println("Verifying if any of the pallets surpasses a threshold...");
         alertON = verifyAlerts(storage, Max_humidity, Max_day, Max_month, Max_year);
@@ -804,21 +853,22 @@ public class Menu {
         }
     }
 
-    public void listPalletes() {//nao ha scans!
+    public void listPalletes() {// nao ha scans!
         boolean isSEmpty = true;
         System.out.println("List of All pallets:");
         for (int i = 2; i >= 0; i--) {
             for (int j = 0; j < 3; j++) {
                 if (storage[j][i] != null) {
                     isSEmpty = false;
-                    System.out.println("\nPallet at (" + storage[j][i].desiredX + ","+ storage[j][i].desiredZ + ") With info:"
-                            + "\nProduct Type: " + storage[j][i].product_type()
-                            + "\nHumidity: " + String.format("%.1f", storage[j][i].humidity()) + " %"
-                            + "\nproducer_ID: " + storage[j][i].producer_ID()
-                            + "\nShipping Date: " + storage[j][i].shipping_day() + "/"
-                            + storage[j][i].shipping_month() + "/" + storage[j][i].shipping_year() 
-                            + "\nDestination: " + storage[j][i].destination()
-                            + "\nAlert State: " + storage[j][i].is_alert());
+                    System.out.println(
+                            "\nPallet at (" + storage[j][i].desiredX + "," + storage[j][i].desiredZ + ") With info:"
+                                    + "\nProduct Type: " + storage[j][i].product_type()
+                                    + "\nHumidity: " + String.format("%.1f", storage[j][i].humidity()) + " %"
+                                    + "\nproducer_ID: " + storage[j][i].producer_ID()
+                                    + "\nShipping Date: " + storage[j][i].shipping_day() + "/"
+                                    + storage[j][i].shipping_month() + "/" + storage[j][i].shipping_year()
+                                    + "\nDestination: " + storage[j][i].destination()
+                                    + "\nAlert State: " + storage[j][i].is_alert());
                 }
             }
             if (isSEmpty == false) {

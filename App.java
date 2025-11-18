@@ -7,7 +7,7 @@ public class App {
 
         int op = -1;
         Scanner scan = new Scanner(System.in);
-        
+
         Menu menu = new Menu();
         Pallet[][] Storage = menu.Storage();
         float Max_humidity = menu.Max_humidity();
@@ -16,25 +16,30 @@ public class App {
         int Max_year = menu.Max_year(); // sim, isto e a data limite de entrega do trabalho
 
         Menu.Calibration();
-        Menu.switchesThread(Storage); //Isto precisa de estar constantemente a correr para que o programa ande sempre a verificar quando é que há switches
-        Menu.EmergencyThread(); //verifica se o user pressiona os switches de emergência
-        Menu.VerificaAlertasThread(Storage); //isto serve para verificar o switch 1 quando estamos no modo de emrgencia e assegura-se que o "RemoveAlerts" corre desde o inicio ao fim
+        Menu.switchesThread(Storage); // Isto precisa de estar constantemente a correr para que o programa ande sempre
+                                      // a verificar quando é que há switches
+        Menu.EmergencyThread(); // verifica se o user pressiona os switches de emergência
+        Menu.VerificaAlertasThread(Storage); // isto serve para verificar o switch 1 quando estamos no modo de emrgencia
+                                             // e assegura-se que o "RemoveAlerts" corre desde o inicio ao fim
 
+        Menu.lastAxisPositionThread(); // isto ve o ultima posicao onde o cage passa pelo uma sensor e guarda os
+                                       // proprios valores
+                                       // dos getPos axis no info.guardaLastXYZ
         while (op != 0) {
-            Storage = menu.Storage();    
+            Storage = menu.Storage();
             Max_humidity = menu.Max_humidity();
             Max_day = menu.Max_day();
             Max_month = menu.Max_month();
-            Max_year = menu.Max_year();//atualiza os valores da storage e dos maximos permitidos pelo user
-            
+            Max_year = menu.Max_year();// atualiza os valores da storage e dos maximos permitidos pelo user
+
             menu.ShowMenu(Max_humidity, Max_day, Max_month, Max_year);
             System.out.println("Enter an option:");
-           // if (menu.is_switch() == false) { 
+            // if (menu.is_switch() == false) {
             op = scan.nextInt();
-           // } else {
-            //op = 100000;
-           // menu.changeSwitch(); //vai meter o switch a false
-           // }
+            // } else {
+            // op = 100000;
+            // menu.changeSwitch(); //vai meter o switch a false
+            // }
             switch (op) {
                 case 1:
                     menu.manualPosition();
@@ -43,7 +48,7 @@ public class App {
                     menu.manualPositionAxis();
                     break;
                 case 3:
-                    menu.Calibration();
+                    Menu.Calibration();
                     break;
                 case 4:
                     menu.addNewPallete();

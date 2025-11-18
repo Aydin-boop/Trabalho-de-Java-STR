@@ -1,5 +1,7 @@
 public class Mechanism {
 
+    EmergnecyInfo info = new EmergnecyInfo();
+
     public static void ledOn(int ledNumber) {
         Storage.ledOn(ledNumber);
     }
@@ -17,7 +19,7 @@ public class Mechanism {
     }
 
     public Boolean bothSwitchesPressed() {
-        return(Storage.getSwtich1_2() == 1);
+        return (Storage.getSwtich1_2() == 1);
     }
 
     public void putPartInCell() {
@@ -31,9 +33,15 @@ public class Mechanism {
             return;
         }
 
+        info.guardaY(3);
         axisY.gotoPos(3);
+
+        info.guardaZ(i / 10);
         axisZ.gotoPos(i / 10);
+
+        info.guardaY(2);
         axisY.gotoPos(2);
+
     }
 
     public void takePartInCell() {
@@ -47,8 +55,13 @@ public class Mechanism {
             return;
         }
 
+        info.guardaY(3);
         axisY.gotoPos(3);
+
+        info.guardaZ(i * 10);
         axisZ.gotoPos(i * 10);
+
+        info.guardaY(2);
         axisY.gotoPos(2);
     }
 
