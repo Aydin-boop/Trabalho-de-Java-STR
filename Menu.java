@@ -1,9 +1,11 @@
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Menu {
+
     static boolean isLed1Interrupted = true;
     static boolean isLed2Interrupted = true;
     static boolean emergencyON = false;
@@ -149,7 +151,7 @@ public class Menu {
             public void run() {
                 while (true) {
                     if (axisX.getPos() != -1) {
-                        // System.out.println(axisX.getPos());//meter um print no thread nao e bom ideia
+                        // System.out.println(axisX.getPos());//meter um print no thread nao e bom ideia. lol, isso vai te dar um montao de prints pelo meio das cenas...
                         info.guardaLastX(axisX.getPos());
                     }
                     if (axisY.getPos() != -1) {
@@ -252,7 +254,6 @@ public class Menu {
                          * } catch (InterruptedException e) {
                          * }
                          */
-
                         // Espera o botão ser solto antes de continuar
                         while (mechanism.switch1Pressed()) {
                             try {
@@ -443,7 +444,7 @@ public class Menu {
         AxisX axisx10 = new AxisX();
         AxisZ axisz10 = new AxisZ();
         double menorD = 100;
-        int maisProximos[] = { 0, 0 };
+        int maisProximos[] = {0, 0};
         for (int i = 1; i <= 3; i++) {
             for (int j = 1; j <= 3; j++) {
                 if (s[i - 1][j - 1] == null) {
@@ -479,24 +480,24 @@ public class Menu {
     }
 
     public void ShowMenu(float Max_humidity, int Max_day, int Max_month, int Max_year) { // ve quais sao as cores que
-                                                                                         // ficam mais bonitas sffv
+        // ficam mais bonitas sffv
         String State;
-        if (emergencyON)
+        if (emergencyON) {
             State = "\u001B[31mEmergency\u001B[0m";
-        else
+        } else {
             State = "\u001B[32mNormal\u001B[0m";
+        }
         System.out.println("\n\n**********STORAGE MENU**********");
         System.out.println("1 - Move cage to the desired (X,Z) coordinates");
         System.out.println("2 - Move only one axis to the desired position");
         System.out.println("3 - Calibrate");
         System.out.println("4 - Place a pallete");
         System.out.println("5 - Withdraw pallete(s)");
-        System.out
-                .println("6 - Define Humidity Threshold (currently at " + String.format("%.1f", Max_humidity) + " %)");
-        System.out.println(
-                "7 - Define maximum shipping date (currently " + Max_day + "/" + Max_month + "/" + Max_year + ")");
+        System.out.println("6 - Define Humidity Threshold (currently at " + String.format("%.1f", Max_humidity) + " %)");
+        System.out.println("7 - Define maximum shipping date (currently " + Max_day + "/" + Max_month + "/" + Max_year + ")");
         System.out.println("8 - List all stored pallets");
         System.out.println("9 - Display information of a pallete by product type or by producer ID");
+        System.out.println("10 - Deliver by product type or by producer ID");
         System.out.println("*****STORAGE STATE*****");
         String X;
         for (int i = 2; i >= 0; i--) {
@@ -509,7 +510,7 @@ public class Menu {
                     X = " ";
                 }
                 System.out.print("\u001B[33m[\u001B[0m" + X + "\u001B[33m]\u001B[0m "); // [] com cor amarela e com
-                                                                                        // background normal
+                // background normal
             }
             System.out.print("\n");
         }
@@ -530,8 +531,9 @@ public class Menu {
             System.out.println("Input X and Z:");
             posX = scan.nextInt();
             posZ = scan.nextInt();
-            if ((((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3))))
+            if ((((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3)))) {
                 System.out.println("Invalid coordinates!!!");
+            }
         } while ((((posX <= 0) || (posX > 3)) && ((posZ != 0))) || (((posX != 0)) && ((posZ <= 0) || (posZ > 3))));
 
         if ((posX == 0) && (posZ == 0)) {
@@ -557,8 +559,9 @@ public class Menu {
                     do {
                         System.out.println("Which Position of Axis X do you want to move?: (1, 2, 3)");
                         op2 = scan.nextInt();
-                        if ((op2 < 0) || (op2 > 3))
+                        if ((op2 < 0) || (op2 > 3)) {
                             System.out.println("Invalid position!");
+                        }
                     } while ((op2 < 0) || (op2 > 3));
                     info.guardaAcao(0);
                     info.guardaX(op2);
@@ -568,8 +571,9 @@ public class Menu {
                     do {
                         System.out.println("Which Position of Axis Y do you want to move?: (1, 2, 3)");
                         op2 = scan.nextInt();
-                        if ((op2 < 0) || (op2 > 3))
+                        if ((op2 < 0) || (op2 > 3)) {
                             System.out.println("Invalid Position!");
+                        }
                     } while ((op2 < 0) || (op2 > 3));
                     info.guardaAcao(0);
                     info.guardaY(op2);
@@ -580,8 +584,9 @@ public class Menu {
                         System.out.println(
                                 "Which Position of Axis Z do you want to move?: (1-1D, 10-1U , 2-2D, 20-2U, 3-3D, 30-3U)");
                         op2 = scan.nextInt();
-                        if ((op2 < 0) || (op2 > 3))
+                        if ((op2 < 0) || (op2 > 3)) {
                             System.out.println("Invalid Position!");
+                        }
                     } while ((op2 < 0) || (op2 > 3));
                     info.guardaAcao(0);
                     info.guardaZ(op2);
@@ -622,8 +627,9 @@ public class Menu {
         do {
             System.out.println("Humidity: ");
             humidity = scan.nextFloat();
-            if ((humidity < 0) || (humidity > 100))
+            if ((humidity < 0) || (humidity > 100)) {
                 System.out.println("Invalid humidity Value!");
+            }
         } while ((humidity < 0) || (humidity > 100));
         System.out.println("Producer ID: ");
         int producerID = scan.nextInt();
@@ -633,25 +639,28 @@ public class Menu {
             System.out.println("Desired Z: ");
             posZposto = scan.nextInt();
             if ((((posXposto <= 0) || (posXposto > 3)) && ((posZposto != 0)))
-                    || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3))))
+                    || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3)))) {
                 System.out.println("Invalid coordinates!");
+            }
         } while ((((posXposto <= 0) || (posXposto > 3)) && ((posZposto != 0)))
                 || (((posXposto != 0)) && ((posZposto <= 0) || (posZposto > 3))));
         do {
-            System.out.println("Shipping day (put 0 on the back in case it is lower than 10): ");
+            System.out.println("Shipping day: ");
             shipping_day = scan.nextInt();
-            System.out.println("Shipping month(put 0 on the back in case it is lower than 10): ");
+            System.out.println("Shipping month: ");
             shipping_month = scan.nextInt();
             System.out.println("Shipping year: ");
             shipping_year = scan.nextInt();
-            if (shipping_day < 10)
+            if (shipping_day < 10) {
                 day = "0" + shipping_day;
-            else
+            } else {
                 day = "" + shipping_day;
-            if (shipping_month < 10)
+            }
+            if (shipping_month < 10) {
                 month = "0" + shipping_month;
-            else
+            } else {
                 month = "" + shipping_month;
+            }
             dateInput = (day + "/" + month + "/" + shipping_year);
             isValid = isValidDate(dateInput, formatter);
             if (isValid == false) {
@@ -742,8 +751,9 @@ public class Menu {
                 posXremovido = scan.nextInt();
                 System.out.println("Desired Z: ");
                 posZremovido = scan.nextInt();
-                if ((posXremovido <= 0) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3))
+                if ((posXremovido <= 0) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3)) {
                     System.out.println("Invalid coordinates!");
+                }
             } while ((posXremovido <= 0) || (posXremovido > 3) || (posZremovido <= 0) || (posZremovido > 3));
             Pallet p1 = storage[posXremovido - 1][posZremovido - 1];
 
@@ -829,14 +839,16 @@ public class Menu {
             Max_month = scan.nextInt();
             System.out.println("Shipping Year: ");
             Max_year = scan.nextInt();
-            if (Max_day < 10)
+            if (Max_day < 10) {
                 day = "0" + Max_day;
-            else
+            } else {
                 day = "" + Max_day;
-            if (Max_month < 10)
+            }
+            if (Max_month < 10) {
                 month = "0" + Max_month;
-            else
+            } else {
                 month = "" + Max_month;
+            }
             dateInput = (day + "/" + month + "/" + Max_year);
             isValid = isValidDate(dateInput, formatter);
             if (isValid == false) {
@@ -862,13 +874,13 @@ public class Menu {
                     isSEmpty = false;
                     System.out.println(
                             "\nPallet at (" + storage[j][i].desiredX + "," + storage[j][i].desiredZ + ") With info:"
-                                    + "\nProduct Type: " + storage[j][i].product_type()
-                                    + "\nHumidity: " + String.format("%.1f", storage[j][i].humidity()) + " %"
-                                    + "\nproducer_ID: " + storage[j][i].producer_ID()
-                                    + "\nShipping Date: " + storage[j][i].shipping_day() + "/"
-                                    + storage[j][i].shipping_month() + "/" + storage[j][i].shipping_year()
-                                    + "\nDestination: " + storage[j][i].destination()
-                                    + "\nAlert State: " + storage[j][i].is_alert());
+                            + "\nProduct Type: " + storage[j][i].product_type()
+                            + "\nHumidity: " + String.format("%.1f", storage[j][i].humidity()) + " %"
+                            + "\nproducer_ID: " + storage[j][i].producer_ID()
+                            + "\nShipping Date: " + storage[j][i].shipping_day() + "/"
+                            + storage[j][i].shipping_month() + "/" + storage[j][i].shipping_year()
+                            + "\nDestination: " + storage[j][i].destination()
+                            + "\nAlert State: " + storage[j][i].is_alert());
                 }
             }
             if (isSEmpty == false) {
@@ -963,7 +975,7 @@ public class Menu {
                     for (int j = 0; j < 3; j++) {
                         if (storage[j][i] != null) {
                             if (productType.equals(storage[j][i].product_type())) {
-                                // isEmpty = false; // pq?
+                                isEmpty = false; // pq? R: e para nao falhar caso nao haja nada lol
                                 System.out.println("Pallete at (" + storage[j][i].desiredX + ","
                                         + storage[j][i].desiredZ + ") With info:"
                                         + "\nProducer ID: " + storage[j][i].producer_ID()
@@ -982,45 +994,46 @@ public class Menu {
                         System.out.println("");
                     }
                 }
-                System.out.println("removing pallets with type of product (1)");
-                int posXremovido = 0;
-                int posZremovido = 0;
-
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (storage[i][j] != null) {
-                            // System.out.println(storage[j][i].product_type());
-                            if (productType.equals(storage[j][i].product_type())) {
-                                info.guardaAcao(3); // como esta a remover alertas, temos de dizer que isto é uma ação
-                                                    // especial
-                                posXremovido = storage[i][j].desiredX();
-                                posZremovido = storage[i][j].desiredZ();
-                                System.out.println(storage[i][j].desiredZ() + " " + storage[i][j].desiredX());
-                                axisXThread = axisXThread(posXremovido);
-                                axisZThread = axisZThread(posZremovido);
-                                axisXThread.join();
-                                axisZThread.join();
-                                mechanism.takePartInCell();
-                                axisXThread = axisXThread(3);
-                                axisZThread = axisZThread(1);
-                                axisXThread.join();
-                                axisZThread.join();
-                                if (Mechanism.cageFull() == 1) {
-                                    System.out.println(
-                                            "Click on the button \"takeFromCage\" to remove the pallet from the system");
-                                    do {
-                                    } while (Mechanism.cageFull() == 1);
+                if (isEmpty == false) {
+                    System.out.println("removing pallets with type of product (1)");
+                    int posXremovido = 0;
+                    int posZremovido = 0;
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            if (storage[i][j] != null) {
+                                // System.out.println(storage[j][i].product_type());
+                                if (productType.equals(storage[j][i].product_type())) {
+                                    info.guardaAcao(3); // como esta a remover alertas, temos de dizer que isto é uma ação
+                                    // especial. Não sei se isto é necessário, mas ok ok
+                                    posXremovido = storage[i][j].desiredX();
+                                    posZremovido = storage[i][j].desiredZ();
+                                    System.out.println(storage[i][j].desiredZ() + " " + storage[i][j].desiredX());
+                                    axisXThread = axisXThread(posXremovido);
+                                    axisZThread = axisZThread(posZremovido);
+                                    axisXThread.join();
+                                    axisZThread.join();
+                                    mechanism.takePartInCell();
+                                    axisXThread = axisXThread(3);
+                                    axisZThread = axisZThread(1);
+                                    axisXThread.join();
+                                    axisZThread.join();
+                                    if (Mechanism.cageFull() == 1) {
+                                        System.out.println(
+                                                "Click on the button \"takeFromCage\" to remove the pallet from the system");
+                                        do {
+                                        } while (Mechanism.cageFull() == 1);
+                                    }
+                                    info.guardaY(1);
+                                    axisY.gotoPos(1);
+                                    System.out.println("Pallet removed!");
+                                    storage[posXremovido - 1][posZremovido - 1] = null;
+                                    info.guardaY(2);
+                                    axisY.gotoPos(2);
                                 }
-                                axisY.gotoPos(1);
-                                System.out.println("Pallet removed!");
-                                storage[posXremovido - 1][posZremovido - 1] = null;
-                                info.guardaY(2);
-                                axisY.gotoPos(2);
                             }
                         }
                     }
-                }
-                if (isEmpty) {
+                } else {
                     System.out.println("There are no matches for that product type!");
                 }
                 break;
@@ -1049,7 +1062,48 @@ public class Menu {
                         System.out.println("");
                     }
                 }
-                if (isE) {
+                if (isE == false) {
+                    System.out.println("removing pallets with producer ID (2)");
+                    int posXremovido = 0;
+                    int posZremovido = 0;
+
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            if (storage[i][j] != null) {
+                                // System.out.println(storage[j][i].product_type());
+                                if (prodID == storage[i][j].producer_ID()) {
+                                    info.guardaAcao(3); // como esta a remover alertas, temos de dizer que isto é uma ação
+                                    // especial. Não sei se isto é necessário, mas ok ok
+                                    posXremovido = storage[i][j].desiredX();
+                                    posZremovido = storage[i][j].desiredZ();
+                                    System.out.println(storage[i][j].desiredZ() + " " + storage[i][j].desiredX());
+                                    axisXThread = axisXThread(posXremovido);
+                                    axisZThread = axisZThread(posZremovido);
+                                    axisXThread.join();
+                                    axisZThread.join();
+                                    mechanism.takePartInCell();
+                                    axisXThread = axisXThread(3);
+                                    axisZThread = axisZThread(1);
+                                    axisXThread.join();
+                                    axisZThread.join();
+                                    if (Mechanism.cageFull() == 1) {
+                                        System.out.println(
+                                                "Click on the button \"takeFromCage\" to remove the pallet from the system");
+                                        do {
+                                        } while (Mechanism.cageFull() == 1);
+                                    }
+                                    info.guardaY(1);
+                                    axisY.gotoPos(1);
+                                    System.out.println("Pallet removed!");
+                                    storage[posXremovido - 1][posZremovido - 1] = null;
+                                    info.guardaY(2);
+                                    axisY.gotoPos(2);
+                                }
+                            }
+                        }
+                    }
+
+                } else {
                     System.out.println("There are no matches for that producer ID!");
                 }
                 break;
