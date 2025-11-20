@@ -9,6 +9,7 @@ public class Menu {
     static boolean isLed1Interrupted = true;
     static boolean isLed2Interrupted = true;
     static boolean emergencyON = false;
+    static boolean isSwitch = false;
 
     static AxisX axisX = new AxisX();
     static AxisY axisY = new AxisY();
@@ -276,18 +277,22 @@ public class Menu {
         return EThread;
     }
 
-    public static Thread switchesThread(Pallet[][] s) throws InterruptedException {
+    public static Thread switchesThread(Pallet[][] s, int op) throws InterruptedException {
         Thread swiThread = new Thread() {
 
             public void run() {
                 while (true) {
                     if (mechanism.switch1Pressed() && (emergencyON == false)) {
                         try {
+                            //sem.acquire();
                             isLed1Interrupted = true;
                             Led1On = led1On();
                             RemoveAlerts(s);
                             mechanism.ledsOff();
-                            System.out.println("Click on number 3 to calibrate and return to the menu");
+                            Calibration();
+                            isSwitch = true;
+                            //sem.release();
+                            System.out.println("Click on a number and click Enter to return to the menu");
                         } catch (InterruptedException ex) {
                             System.out.println("Interrupted Exception in switches Thread!!!");
                         }
@@ -300,6 +305,25 @@ public class Menu {
                                 System.out.println("Interrupted Exception in switches Thread!!!");
                             }
                         }
+                    }
+
+                    if (mechanism.switch2Pressed() && (emergencyON == true)) {
+                        //try{
+                        //sem.acquire();
+                        mechanism.ledsOff();
+                        BothLeds().interrupt();
+                        mechanism.ledsOff();
+                        emergencyON = false;
+                        isLed1Interrupted = true;
+                        isLed2Interrupted = true;
+                        isSwitch = true;
+                        try{Calibration();}catch(InterruptedException e) {}
+                        try{removeAll(s);}catch(InterruptedException e) {}
+                        try{Calibration();}catch(InterruptedException e) {}
+                        System.out.println("Click on a number and Enter to return to the menu");
+                        //System.out.println("juygjg");
+                        //sem.release();
+                        //} catch(InterruptedException e){}
                     }
 
                     try {
@@ -342,6 +366,52 @@ public class Menu {
         } catch (DateTimeParseException e) {
             return false;
         }
+    }
+
+    public static void removeAll (Pallet [][]s) throws InterruptedException{
+        System.out.println("removing all pallets!!");
+        int posXremovido = 0;
+        int posZremovido = 0;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (s[i][j] != null) {
+                        posXremovido = s[i][j].desiredX();
+                        posZremovido = s[i][j].desiredZ();
+                        axisXThread= axisXThread(posXremovido);
+                        axisZThread = axisZThread(posZremovido);
+                        axisXThread.join();
+                        axisZThread.join();
+                        mechanism.takePartInCell();
+                        axisXThread = axisXThread(3);
+                        axisZThread = axisZThread(1);
+                        axisXThread.join();
+                        axisZThread.join();
+                        if (Mechanism.cageFull() == 1) {
+                            System.out.println(
+                                    "Click on the button \"takeFromCage\" to remove the pallet from the system");
+                            do {
+                            } while (Mechanism.cageFull() == 1);
+                        }
+                        axisY.gotoPos(1);
+                        System.out.println("Pallet with info"
+                                + "\nProductType: " + s[posXremovido - 1][posZremovido - 1].product_type()
+                                + "\nHumidity: " + s[posXremovido - 1][posZremovido - 1].humidity() + " %"
+                                + "\nproducer_ID: " + s[posXremovido - 1][posZremovido - 1].producer_ID()
+                                + "\nX: " + s[posXremovido - 1][posZremovido - 1].desiredX()
+                                + "\nZ: " + s[posXremovido - 1][posZremovido - 1].desiredZ()
+                                + "\nShippingDate: " + s[posXremovido - 1][posZremovido - 1].shipping_day() + "/"
+                                + s[posXremovido - 1][posZremovido - 1].shipping_month() + "/"
+                                + s[posXremovido - 1][posZremovido - 1].shipping_year()
+                                + "\nDestination: " + s[posXremovido - 1][posZremovido - 1].destination()
+                                + "\nremoved!");
+                        s[posXremovido - 1][posZremovido - 1] = null;
+                        info.guardaY(2);
+                        axisY.gotoPos(2);
+                }
+            }
+        }
+        System.out.println("ja saiu do remove all");
     }
 
     public static void RemoveAlerts(Pallet[][] s) throws InterruptedException {
@@ -460,7 +530,6 @@ public class Menu {
         }
         return maisProximos;
     }
-
     // menu options
     public static void Calibration() throws InterruptedException {
         info.guardaAcao(0);
@@ -545,8 +614,8 @@ public class Menu {
 
         axisXThread = axisXThread(posX);
         axisZThread = axisZThread(posZ);
-        axisXThread.join();
-        axisZThread.join();
+        //axisXThread.join();
+        //axisZThread.join();
 
     }
 
