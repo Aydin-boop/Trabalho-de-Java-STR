@@ -277,7 +277,7 @@ public class Menu {
         return EThread;
     }
 
-    public static Thread switchesThread(Pallet[][] s, int op) throws InterruptedException {
+    public static Thread switchesThread(Pallet[][] s) throws InterruptedException {
         Thread swiThread = new Thread() {
 
             public void run() {
@@ -556,18 +556,18 @@ public class Menu {
         } else {
             State = "\u001B[32mNormal\u001B[0m";
         }
-        System.out.println("\n\n**********STORAGE MENU**********");
-        System.out.println("1 - Move cage to the desired (X,Z) coordinates");
-        System.out.println("2 - Move only one axis to the desired position");
-        System.out.println("3 - Calibrate");
-        System.out.println("4 - Place a pallete");
-        System.out.println("5 - Withdraw pallete(s)");
-        System.out.println("6 - Define Humidity Threshold (currently at " + String.format("%.1f", Max_humidity) + " %)");
-        System.out.println("7 - Define maximum shipping date (currently " + Max_day + "/" + Max_month + "/" + Max_year + ")");
-        System.out.println("8 - List all stored pallets");
-        System.out.println("9 - Display information of a pallete by product type or by producer ID");
-        System.out.println("10 - Deliver by product type or by producer ID");
-        System.out.println("*****STORAGE STATE*****");
+        System.out.println("\n\n\u001B[34m**********STORAGE MENU**********\u001B[0m");
+        System.out.println("\u001B[34m1\u001B[0m - Move cage to the desired (X,Z) coordinates");
+        System.out.println("\u001B[34m2\u001B[0m - Move only one axis to the desired position");
+        System.out.println("\u001B[34m3\u001B[0m - Calibrate");
+        System.out.println("\u001B[34m4\u001B[0m - Place a pallete");
+        System.out.println("\u001B[34m5\u001B[0m - Withdraw pallete(s)");
+        System.out.println("\u001B[34m6\u001B[0m - Define Humidity Threshold (currently at " + String.format("%.1f", Max_humidity) + " %)");
+        System.out.println("\u001B[34m7\u001B[0m - Define maximum shipping date (currently " + Max_day + "/" + Max_month + "/" + Max_year + ")");
+        System.out.println("\u001B[34m8\u001B[0m - List all stored pallets");
+        System.out.println("\u001B[34m9\u001B[0m - Display information of a pallete by product type or by producer ID");
+        System.out.println("\u001B[34m10\u001B[0m - Deliver by product type or by producer ID");
+        System.out.println("\u001B[36m*****STORAGE STATE*****\u001B[0m");
         String X;
         for (int i = 2; i >= 0; i--) {
             for (int j = 0; j < 3; j++) {
@@ -614,8 +614,8 @@ public class Menu {
 
         axisXThread = axisXThread(posX);
         axisZThread = axisZThread(posZ);
-        //axisXThread.join();
-        //axisZThread.join();
+        axisXThread.join();
+        axisZThread.join();
 
     }
 
