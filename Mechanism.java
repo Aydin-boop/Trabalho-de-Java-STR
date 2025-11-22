@@ -54,7 +54,6 @@ public class Mechanism {
             System.out.println("Cage nao se encontra numa posicao para tirar paletes");
             return;
         }
-
         info.guardaY(3);
         axisY.gotoPos(3);
 
