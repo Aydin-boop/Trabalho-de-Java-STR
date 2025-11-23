@@ -24,10 +24,6 @@ public class AxisX implements Axis {
     @Override
     public void gotoPos(int pos) {
 
-        if (Menu.isSwitch2) {
-            return;
-        }
-
         switch (pos) {
             case 1:
                 moveBackward();

@@ -46,7 +46,7 @@ public class Menu {
     static EmergnecyInfo info = new EmergnecyInfo();
 
     // threads
-    public static Thread axisXThread(int pos) {
+    public static void axisXThread(int pos) {
         info.guardaX(pos);
         axisXThread = new Thread() {
             public void run() {
@@ -54,11 +54,10 @@ public class Menu {
             }
         };
         axisXThread.start();
-        return axisXThread;
-
+      
     }
 
-    public static Thread axisZThread(int pos) {
+    public static void axisZThread(int pos) {
         info.guardaZ(pos);
         axisZThread = new Thread() {
             public void run() {
@@ -66,11 +65,10 @@ public class Menu {
             }
         };
         axisZThread.start();
-        return axisZThread;
-
+        
     }
 
-    public static Thread axisYThread(int pos) {
+    public static void axisYThread(int pos) {
         info.guardaY(pos);
         axisYThread = new Thread() {
             public void run() {
@@ -78,8 +76,7 @@ public class Menu {
             }
         };
         axisYThread.start();
-        return axisYThread;
-
+      
     }
 
     public static Thread led1On() {
@@ -181,9 +178,9 @@ public class Menu {
                         axisZ.stop();
                         axisX.stop();
                         axisY.stop();
-                        // axisZThread.interrupt();
-                        // axisXThread.interrupt();
-                        // axisYThread.interrupt();
+                        //axisZThread.interrupt();
+                        //axisXThread.interrupt();
+                        //axisYThread.interrupt();
                         emergencyON = true;
                         isLed1Interrupted = false;
                         isLed2Interrupted = false;
@@ -242,13 +239,13 @@ public class Menu {
 
                         //System.out.println("going towards right sentido " + info.posX() + " " + info.posY() + " " + info.posZ() + " e "+ info.posLastX() + " " + info.posLastY() + " " + info.posLastZ());
                         info.axisGoingTo();
-                        axisXThread = axisXThread(info.posX());
+                        axisXThread(info.posX());
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
                         }
-                        axisZThread = axisZThread(info.posZ());
-                        axisYThread = axisYThread(info.posY());
+                        axisZThread(info.posZ());
+                        axisYThread(info.posY());
 
 
                         /*
@@ -292,6 +289,11 @@ public class Menu {
                             if (led1On().isAlive() == false) {
                                 Led1On = led1On();
                             }
+                            if(Mechanism.cageFull() == 1) {
+                                do { 
+                                    try { Thread.sleep(100);} catch(InterruptedException e){}
+                                } while (Mechanism.cageFull() == 1);
+                            }
                             RemoveAlerts(s);
                             isLed1Interrupted = true;
                             mechanism.ledsOff();
@@ -325,29 +327,12 @@ public class Menu {
                             do {
                             } while (Mechanism.cageFull() == 1);
                         }
-
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                        }
                         try {
                             Calibration();
-                        } catch (InterruptedException e) {
-                        }
-                        try {
-                            Thread.sleep(10);
                         } catch (InterruptedException e) {
                         }
                         try {
                             removeAll(s);
-                        } catch (InterruptedException e) {
-                        }
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                        }
-                        try {
-                            Calibration();
                         } catch (InterruptedException e) {
                         }
 
@@ -415,13 +400,13 @@ public class Menu {
                 if (s[i][j] != null) {
                     posXremovido = s[i][j].desiredX();
                     posZremovido = s[i][j].desiredZ();
-                    axisXThread = axisXThread(posXremovido);
-                    axisZThread = axisZThread(posZremovido);
+                    axisXThread(posXremovido);
+                    axisZThread(posZremovido);
                     axisXThread.join();
                     axisZThread.join();
                     mechanism.takePartInCell();
-                    axisXThread = axisXThread(3);
-                    axisZThread = axisZThread(1);
+                    axisXThread(3);
+                    axisZThread(1);
                     axisXThread.join();
                     axisZThread.join();
                     if (Mechanism.cageFull() == 1) {
@@ -449,6 +434,10 @@ public class Menu {
             }
         }
         // System.out.println("ja saiu do remove all");
+                                try {
+                            Calibration();
+                        } catch (InterruptedException e) {
+                        }
     }
 
     public static void RemoveAlerts(Pallet[][] s) throws InterruptedException {
@@ -463,15 +452,15 @@ public class Menu {
                         info.guardaAcao(3); // como esta a remover alertas, temos de dizer que isto é uma ação especial
                         posXremovido = s[i][j].desiredX();
                         posZremovido = s[i][j].desiredZ();
-                        axisXThread = axisXThread(posXremovido);
-                        axisZThread = axisZThread(posZremovido);
+                        axisXThread(posXremovido);
+                        axisZThread(posZremovido);
                         do {
                         } while ((axisZThread.isAlive()) || (axisXThread.isAlive())); //espera as threads acabarem ou serem interrompidas
                         do {
                         } while (emergencyON); //espera sair do modo de emergencia
                         mechanism.takePartInCell();
-                        axisXThread = axisXThread(3);
-                        axisZThread = axisZThread(1);
+                        axisXThread(3);
+                        axisZThread(1);
                         do {
                         } while ((axisZThread.isAlive()) || (axisXThread.isAlive())); //espera as threads acabarem ou serem interrompidas
                         do {
@@ -581,10 +570,10 @@ public class Menu {
         } while (axisY.getPos() == -1);
         axisY.stop();
 
-        axisYThread = axisYThread(2);
+        axisYThread(2);
         axisYThread.join();
-        axisXThread = axisXThread(1);
-        axisZThread = axisZThread(1);
+        axisXThread(1);
+        axisZThread(1);
         axisXThread.join();
         axisZThread.join();
     }
@@ -658,11 +647,11 @@ public class Menu {
             posZ = pos[1];
             System.out.println("Coordinates of auto-pilot to reduce travel distance: (" + posX + "," + posZ + ")");
         }
-
-        axisXThread = axisXThread(posX);
-        axisZThread = axisZThread(posZ);
-        do {
-        } while ((axisXThread.isAlive()) || (axisZThread.isAlive())); //espera ate que as duas threads sejam interrompidas, basicamente o mesmo que dois joins seguidos mas so que sai quando as threads sao interrompidas tbm...
+        
+        axisXThread(posX);
+        axisZThread(posZ);
+            do {
+            } while ((axisXThread.isAlive()) || (axisZThread.isAlive())); //espera ate que as duas threads sejam interrompidas, basicamente o mesmo que dois joins seguidos mas so que sai quando as threads sao interrompidas tbm...
     }
 
     public void manualPositionAxis() {
@@ -744,8 +733,8 @@ public class Menu {
         int shipping_year = 0;
         String day;
         String month;
-        axisXThread = axisXThread(1);
-        axisZThread = axisZThread(1);
+        axisXThread(1);
+        axisZThread(1);
         axisXThread.join();
         axisZThread.join();
         info.guardaY(1);
@@ -851,8 +840,8 @@ public class Menu {
             if (Mechanism.cageFull() == 1) {
                 info.guardaAcao(2);
                 info.guardaPalete(true);
-                axisXThread = axisXThread(posXposto);
-                axisZThread = axisZThread(posZposto * 10);
+                axisXThread(posXposto);
+                axisZThread(posZposto * 10);
 
                 do {
                 } while ((axisZThread.isAlive()) || (axisXThread.isAlive())); //espera as threads acabarem ou serem interrompidas
@@ -892,7 +881,11 @@ public class Menu {
                         p.change_alert(true);
                         System.out.println("Pallete with Alert!");
                     }
+                    do {
+                    } while ((axisZThread.isAlive()) || (axisXThread.isAlive()));
+                    try { Thread.sleep(500);} catch(InterruptedException e){} //isto e so para garantir que ele faz as verificacoes no sitio certo
                     mechanism.putPartInCell();
+                    if (Mechanism.cageFull() == 0)
                     storage[posXposto - 1][posZposto - 1] = p;
                 }
             } else {
@@ -938,45 +931,46 @@ public class Menu {
             Pallet p1 = storage[posXremovido - 1][posZremovido - 1];
 
             if (p1 != null) {
-                axisXThread = axisXThread(posXremovido);
-                axisZThread = axisZThread(posZremovido);
+                axisXThread(posXremovido);
+                axisZThread(posZremovido);
                 do {
                 } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                 do {
                 } while (emergencyON == true);
                 if (isSwitch2 == false) {
-                    axisXThread = axisXThread(posXremovido);
-                    axisZThread = axisZThread(posZremovido);
+                    axisXThread(posXremovido);
+                    axisZThread(posZremovido);
                     do {
                     } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
+                    try { Thread.sleep(500);} catch(InterruptedException e){}
                     info.guardaAcao(1);
                     info.guardaPalete(false);
                     mechanism.takePartInCell();
                     if (opt == 1) {
-                        axisXThread = axisXThread(3);
+                        axisXThread(3);
                     } else if (opt == 2) {
-                        axisXThread = axisXThread(posXremovido);
+                        axisXThread(posXremovido);
                         isLed2Interrupted = false;
                         if (led2On().isAlive() == false) {
                             Led2On = led2On();
                         }
                     }
-                    axisZThread = axisZThread(1);
+                    axisZThread(1);
                     do {
                     } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                     do {
                     } while (emergencyON == true);
                     if (isSwitch2 == false) {
                         if (opt == 1) {
-                            axisXThread = axisXThread(3);
+                           axisXThread(3);
                         } else if (opt == 2) {
-                            axisXThread = axisXThread(posXremovido);
+                            axisXThread(posXremovido);
                             isLed2Interrupted = false;
                             if (led2On().isAlive() == false) {
                                 Led2On = led2On();
                             }
                         }
-                        axisZThread = axisZThread(1);
+                        axisZThread(1);
                         do {
                         } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                         if (Mechanism.cageFull() == 1) {
@@ -1215,27 +1209,27 @@ public class Menu {
                                         posXremovido = storage[i][j].desiredX();
                                         posZremovido = storage[i][j].desiredZ();
                                         System.out.println(storage[i][j].desiredZ() + " " + storage[i][j].desiredX());
-                                        axisXThread = axisXThread(posXremovido);
-                                        axisZThread = axisZThread(posZremovido);
+                                       axisXThread(posXremovido);
+                                        axisZThread(posZremovido);
                                         do {
                                         } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                         do {
                                         } while (emergencyON == true);
                                         if (emergencyON == false) {
-                                            axisXThread = axisXThread(posXremovido);
-                                            axisZThread = axisZThread(posZremovido);
+                                            axisXThread(posXremovido);
+                                            axisZThread(posZremovido);
                                             do {
                                             } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                             mechanism.takePartInCell();
-                                            axisXThread = axisXThread(3);
-                                            axisZThread = axisZThread(1);
+                                            axisXThread(3);
+                                            axisZThread(1);
                                             do {
                                             } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                             do {
                                             } while (emergencyON == true);
                                             if (emergencyON == false) {
-                                                axisXThread = axisXThread(3);
-                                                axisZThread = axisZThread(1);
+                                                axisXThread(3);
+                                                axisZThread(1);
                                                 do {
                                                 } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                                 if (Mechanism.cageFull() == 1) {
@@ -1300,27 +1294,27 @@ public class Menu {
                                         posXremovido = storage[i][j].desiredX();
                                         posZremovido = storage[i][j].desiredZ();
                                         System.out.println(storage[i][j].desiredZ() + " " + storage[i][j].desiredX());
-                                        axisXThread = axisXThread(posXremovido);
-                                        axisZThread = axisZThread(posZremovido);
+                                        axisXThread(posXremovido);
+                                        axisZThread(posZremovido);
                                         do {
                                         } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                         do {
                                         } while (emergencyON == true);
                                         if (isSwitch2 == false) {
-                                            axisXThread = axisXThread(posXremovido);
-                                            axisZThread = axisZThread(posZremovido);
+                                            axisXThread(posXremovido);
+                                            axisZThread(posZremovido);
                                             do {
                                             } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                             mechanism.takePartInCell();
-                                            axisXThread = axisXThread(3);
-                                            axisZThread = axisZThread(1);
+                                            axisXThread(3);
+                                            axisZThread(1);
                                             do {
                                             } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                             do {
                                             } while (emergencyON == true);
                                             if (isSwitch2 == false) {
-                                                axisXThread = axisXThread(3);
-                                                axisZThread = axisZThread(1);
+                                                axisXThread(3);
+                                                axisZThread(1);
                                                 do {
                                                 } while ((axisXThread.isAlive()) || (axisZThread.isAlive()));
                                                 if (Mechanism.cageFull() == 1) {
